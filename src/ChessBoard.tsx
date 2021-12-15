@@ -7,10 +7,11 @@ const horizontalAxis = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 const ChessBoard = () => {
   let board = [];
+  let image = undefined;
   for (let j = verticalAxis.length - 1; j >= 0; j--) {
     for (let i = 0; i < horizontalAxis.length; i++) {
       let num = j + i + 2;
-      board.push(<Tile number={num} />);
+      board.push(<Tile number={num} image={image} />);
     }
   }
 
@@ -18,3 +19,6 @@ const ChessBoard = () => {
 };
 
 export default ChessBoard;
+//if (verticalAxis[1] && horizontalAxis[i]) {
+//  board.push(<Tile number={num} image={'figgures/pawn.png'} />);
+//}
