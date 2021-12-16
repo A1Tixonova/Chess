@@ -121,8 +121,6 @@ def king_pos(board: dict, color: str) -> tuple:
 
 
 def check_checkmate(board: dict, pos, col) -> bool:
-    x, y = to_tuple(pos)
-    f_op = []
     for i, j in board.items():
         if j[1] != col and check_turn(board, i, pos):
             return True
