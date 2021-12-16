@@ -25,21 +25,76 @@ def create_board(name: str) -> None:
         json.dump(data, file)
 
 
-def write_turn(a: str, b: str, name: str) -> bool:
+def write_turn(a: str, b: str, name: str, tcol) -> bool:
     a1, a2 = to_tuple(a)
     b1, b2 = to_tuple(b)
+    x = b1 - a1
+    y = b2 - a2
     if (a1 < 0) or (a1 > 7) or (a2 < 0) or (a2 > 7) or (b1 < 0) or (b1 > 7) or (b2 < 0) or (b2 > 7):
         raise Exception('Wrong coordinates')
     with open(name, "r") as read_file:
         cur_board: dict = json.load(read_file)
         if a not in cur_board:
-            raise Exception("Wrong coordinates")
-        if check_turn(cur_board, a, b) == 1:
-            temp = cur_board.pop(a)
-            cur_board[b] = temp
+            return False
 
-    with open(name, 'w') as file:
-        json.dump(cur_board, file)
+        success = True
+        turn = check_turn(cur_board, a, b)
+        color = cur_board[a][1]
+        if tcol != color:
+            return False
+        if cur_board[a][0] == 'k' and turn!=3:
+            l = list(filter(lambda x: not check_checkmate(cur_board, x, color), get_king_turns(a1, a2)))
+            if b in l:
+                temp = cur_board.pop(a)
+                cur_board[b] = temp
+        else:
+            kp = king_pos(cur_board, color)
+            if check_checkmate(cur_board, kp, color):
+                temp = cur_board.pop(a)
+                cur_board[b] = temp
+                if check_checkmate(cur_board, kp, color):
+                    success = False
+            else:
+
+                if turn == 1:
+                    temp = cur_board.pop(a)
+                    cur_board[b] = temp
+                elif turn == 2:
+                    ind = from_tuple((a1 + x, a2))
+                    en = cur_board[ind]
+                    if en[0] == cur_board[a][0] and en[1] != cur_board[a][1]:
+                        temp = cur_board.pop(a)
+                        cur_board.pop(ind)
+                        cur_board[b] = temp
+                elif turn == 3:
+                    if cur_board[a][1]=='w':
+                        if x>0:
+                            a1 = 'h1'
+                            a2 = 'f1'
+                        else:
+                            a1 = 'a1'
+                            a2 = 'd1'
+                    else:
+                        if x>0:
+                            a1 = 'h8'
+                            a2 = 'f8'
+                        else:
+                            a1 = 'a8'
+                            a2 = 'd8'
+                    temp = cur_board.pop(a1)
+                    cur_board[a2] = temp
+                    temp = cur_board.pop(a)
+                    cur_board[b] = temp
+                    kp = king_pos(cur_board, color)
+                    if check_checkmate(cur_board, b, color):
+                        success = False
+                else:
+                    success = False
+
+    if success:
+        with open(name, 'w') as file:
+            json.dump(cur_board, file)
+    return success
 
 
 def print_board(name: str) -> None:
@@ -56,27 +111,38 @@ def print_board(name: str) -> None:
         print()
 
 
-def check_checkmate(board: dict, color: str):
+def king_pos(board: dict, color: str) -> tuple:
     pos = 0
+    col = 'k' + color
     for i, j in board.items():
-        if j == ('k' + color):
+        if j == col:
             pos = i
+    return pos
+
+
+def check_checkmate(board: dict, pos, col) -> bool:
     x, y = to_tuple(pos)
-    t = []
+    f_op = []
+    for i, j in board.items():
+        if j[1] != col and check_turn(board, i, pos):
+            return True
+
+    return False
 
 
-def get_king_turns(x: int, y: int):
+def get_king_turns(x: int, y: int) -> list:
     t = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)]
     while True:
         ind = -1
-        for i, x0, y0 in enumerate(t):
-            if x0 > 7 or x0 < 0 or y0 < 0 or y0 > 7:
+        for i, x in enumerate(t):
+            if x[0] > 7 or x[0] < 0 or x[1] < 0 or x[1] > 7:
                 ind = i
                 break
         if ind == -1:
             break
         else:
             t.pop(ind)
+    return list(map(lambda x: from_tuple(x), t))
 
 
 def check_turn(board: dict, a: str, b: str) -> int:
@@ -136,13 +202,15 @@ def check_turn(board: dict, a: str, b: str) -> int:
         if abs(x) == 2 and y == 0 and a2 == 0:
             a1, b1 = min(a1, b1), max(a1, b1)
             if (from_tuple((0, a1 + 1)) not in board) and (from_tuple((0, a1 + 2)) not in board):
-                return 3
+                if (x>0 and 'h1' in board and board['h1'] == 'rw') or (x<0 and 'a1' in board and board['a1'] == 'rw'):
+                    return 3
 
     if fig == 'kb':
         if abs(x) == 2 and y == 0 and a2 == 7:
             a1, b1 = min(a1, b1), max(a1, b1)
             if (from_tuple((7, a1 + 1)) not in board) and (from_tuple((7, a1 + 2)) not in board):
-                return 3
+                if (x>0 and 'h8' in board and board['h8'] == 'rb') or (x<0 and 'a8' in board and board['a8'] == 'rb'):
+                    return 3
 
     return 0
 
@@ -159,8 +227,21 @@ def from_tuple(pos: tuple) -> str:
     return chr(x + 97) + str(y + 1)
 
 
-bo = 'firstboard.json'
-create_board(bo)
-print_board(bo)
-write_turn('b1', 'c3', bo)
-print_board(bo)
+def debug(inp: list) -> None:
+    bo = 'firstboard.json'
+    create_board(bo)
+    p = 'w'
+    while inp:
+        t = inp.pop(0).split()
+        print(f'{p} turn')
+        if write_turn(*t, bo, p):
+            p = 'w' if p!='w' else 'b'
+
+        print_board(bo)
+
+
+if __name__ == '__main__':
+    vz1 = ['b1 c3', 'd7 d5', 'c3 b1', 'd5 d4','e2 e4', 'd4 e3']
+    vz2 = ['b1 c3', 'd7 d5', 'c3 b1', 'd5 d4','e2 e4', 'd4 e3']
+    debug(vz2)
+
