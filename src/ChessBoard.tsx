@@ -15,13 +15,35 @@ const ChessBoard = () => {
       let num = j + i + 2;
       let res = horizontalAxis[i] + verticalAxis[j];
       if (horizontalAxis[i] + verticalAxis[j] in figures) {
-        board.push(<Tile number={num} image="../assets/p_w.png" />);
+        if ((i === 0 && j === 7) || (i === 7 && j === 7)) {
+          board.push(<Tile number={num} image="../assets/r_b.png" />);
+        } else if ((i === 1 && j === 7) || (i === 6 && j === 7)) {
+          board.push(<Tile number={num} image="../assets/n_b.png" />);
+        } else if ((i === 2 && j === 7) || (i === 5 && j === 7)) {
+          board.push(<Tile number={num} image="../assets/b_b.png" />);
+        } else if (i === 4 && j === 7) {
+          board.push(<Tile number={num} image="../assets/k_b.png" />);
+        } else if (i === 3 && j === 7) {
+          board.push(<Tile number={num} image="../assets/q_b.png" />);
+        } else if ((i === 0 && j === 0) || (i === 7 && j === 0)) {
+          board.push(<Tile number={num} image="../assets/r_w.png" />);
+        } else if ((i === 1 && j === 0) || (i === 6 && j === 0)) {
+          board.push(<Tile number={num} image="../assets/n_w.png" />);
+        } else if ((i === 2 && j === 0) || (i === 5 && j === 0)) {
+          board.push(<Tile number={num} image="../assets/b_w.png" />);
+        } else if (i === 3 && j === 0) {
+          board.push(<Tile number={num} image="../assets/q_w.png" />);
+        } else if (i === 4 && j === 0) {
+          board.push(<Tile number={num} image="../assets/k_w.png" />);
+        } else {
+          board.push(<Tile number={num} image={image} />);
+        }
       } else {
         board.push(<Tile number={num} image={image} />);
       }
     }
   }
-
+  console.log({ ...board });
   return <div id="chessboard">{board}</div>;
 };
 
