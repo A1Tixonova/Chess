@@ -27,10 +27,19 @@
   align-items: center;
 }
 
-@media screen and (min-width: 1224px) {
+.cPiece {
+  width: 100px;
+  height: 100px;
+  background-repeat: no-repeat;
+  background-size: 80px;
+  background-position: center;
+}
+
+@media screen and (max-width: 1224px) {
   #chessboard {
-    width: 800px;
-    height: 800px;
+    width: 400px;
+    height: 400px;
+    background-color: blue;
   }
 }
 
