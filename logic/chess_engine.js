@@ -1,9 +1,4 @@
-function create_board (name) {
-	let data = {'a1': 'rw', 'a2': 'pw', 'b1': 'nw', 'b2': 'pw', 'c1': 'bw', 'c2': 'pw', 'd1': 'qw', 'd2': 'pw', 'e1': 'kw', 'e2': 'pw', 'f1': 'bw', 'f2': 'pw', 'g1': 'nw', 'g2': 'pw', 'h1': 'rw', 'h2': 'pw', 'a8': 'rb', 'a7': 'pb', 'b8': 'nb', 'b7': 'pb', 'c8': 'bb', 'c7': 'pb', 'd8': 'qb', 'd7': 'pb', 'e8': 'kb', 'e7': 'pb', 'f8': 'bb', 'f7': 'pb', 'g8': 'nb', 'g7': 'pb', 'h8': 'rb', 'h7': 'pb'};
-	localStorage.setItem(name, JSON.stringify(data));
-};
-
-function write_turn(a, b, name, tcol) {
+function write_turn(a, b, cur_board, tcol) {
   let tuple = to_tuple(a);
   let a1 = tuple[0];
   let a2 = tuple[1];
@@ -15,7 +10,7 @@ function write_turn(a, b, name, tcol) {
   if ((a1 < 0) || (a1 > 7) || (a2 < 0) || (a2 > 7) || (b1 < 0) || (b1 > 7) || (b2 < 0) || (b2 > 7)) {
     return false;
   }
-  var cur_board = JSON.parse(localStorage.getItem(name));
+
   if (!(a in cur_board)) {
     return false;
   }
@@ -90,7 +85,6 @@ function write_turn(a, b, name, tcol) {
       }
     }
 
-  localStorage.setItem(name, JSON.stringify(cur_board));
   return true;
 }
 
@@ -254,8 +248,7 @@ function range(a, b) {
   return arr;
 }
 
-function print_board(name) {
-  let board = JSON.parse(localStorage.getItem(name));
+function print_board(board) {
   for (let i = 0; i < 8; i++) {
     let ar = '';
     for (let j = 0; j < 8; ++j) {
@@ -268,10 +261,7 @@ function print_board(name) {
 
 }
 
-// localStorage.setItem(name, JSON.stringify(cur_board));
-// let obj1 = JSON.parse(localStorage.getItem('myStorage'));
 
-//let name = 'firstboard';
-//create_board(name);
-//write_turn('b1', 'c3', name, 'w');
-//print_board(name);
+// let data = {'a1': 'rw', 'a2': 'pw', 'b1': 'nw', 'b2': 'pw', 'c1': 'bw', 'c2': 'pw', 'd1': 'qw', 'd2': 'pw', 'e1': 'kw', 'e2': 'pw', 'f1': 'bw', 'f2': 'pw', 'g1': 'nw', 'g2': 'pw', 'h1': 'rw', 'h2': 'pw', 'a8': 'rb', 'a7': 'pb', 'b8': 'nb', 'b7': 'pb', 'c8': 'bb', 'c7': 'pb', 'd8': 'qb', 'd7': 'pb', 'e8': 'kb', 'e7': 'pb', 'f8': 'bb', 'f7': 'pb', 'g8': 'nb', 'g7': 'pb', 'h8': 'rb', 'h7': 'pb'};
+// write_turn('b1', 'c3', data, 'w');
+// print_board(data);
