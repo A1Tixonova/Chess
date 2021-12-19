@@ -37,7 +37,6 @@ def write_turn(a: str, b: str, name: str, tcol) -> bool:
         if a not in cur_board:
             return False
 
-        success = True
         turn = check_turn(cur_board, a, b)
         color = cur_board[a][1]
         if tcol != color:
@@ -53,7 +52,7 @@ def write_turn(a: str, b: str, name: str, tcol) -> bool:
                 temp = cur_board.pop(a)
                 cur_board[b] = temp
                 if check_checkmate(cur_board, kp, color):
-                    success = False
+                    return False
             else:
 
                 if turn == 1:
@@ -87,14 +86,13 @@ def write_turn(a: str, b: str, name: str, tcol) -> bool:
                     cur_board[b] = temp
                     kp = king_pos(cur_board, color)
                     if check_checkmate(cur_board, b, color):
-                        success = False
+                        return False
                 else:
-                    success = False
+                    return False
 
-    if success:
-        with open(name, 'w') as file:
-            json.dump(cur_board, file)
-    return success
+    with open(name, 'w') as file:
+        json.dump(cur_board, file)
+    return True
 
 
 def print_board(name: str) -> None:
@@ -110,6 +108,7 @@ def print_board(name: str) -> None:
             print()
         print()
 
+# console.log('sdgf');
 
 def king_pos(board: dict, color: str) -> tuple:
     pos = 0
@@ -172,20 +171,20 @@ def check_turn(board: dict, a: str, b: str) -> int:
         if y == -1 and (x == 1 or x == -1) and board[from_tuple((b1, b2 + 1))] == 'pw':
             return 2
 
-    if fig == 'bb' or fig == 'bw' or fig == 'qw' or fig == 'qb':
+    if fig == 'rb' or fig == 'rw' or fig == 'qw' or fig == 'qb':
         if y == 0 and all(map(lambda t: from_tuple((t, a2)) not in board, range(min(a1, b1) + 1, max(a1, b1)))):
             return 1
         if x == 0 and all(map(lambda t: from_tuple((a1, t)) not in board, range(min(a2, b2) + 1, max(a2, b2)))):
             return 1
 
     if fig == 'bb' or fig == 'bw' or fig == 'qw' or fig == 'qb':
-        if x == y and x > 0 and map(lambda t: from_tuple((a1 + t, a2 + t)) not in board, range(1, x)):
+        if x == y and x > 0 and all(map(lambda t: from_tuple((a1 + t, a2 + t)) not in board, range(1, x))):
             return 1
-        if x == y and x < 0 and map(lambda t: from_tuple((a1 - t, a2 - t)) not in board, range(1, -x)):
+        if x == y and x < 0 and all(map(lambda t: from_tuple((a1 - t, a2 - t)) not in board, range(1, -x))):
             return 1
-        if x == -y and x > 0 and map(lambda t: from_tuple((a1 + t, a2 - t)) not in board, range(1, x)):
+        if x == -y and x > 0 and all(map(lambda t: from_tuple((a1 + t, a2 - t)) not in board, range(1, x))):
             return 1
-        if x == -y and x < 0 and map(lambda t: from_tuple((a1 - t, a2 + t)) not in board, range(1, -x)):
+        if x == -y and x < 0 and all(map(lambda t: from_tuple((a1 - t, a2 + t)) not in board, range(1, -x))):
             return 1
 
     if fig == 'nb' or fig == 'nw':
@@ -242,4 +241,3 @@ if __name__ == '__main__':
     vz1 = ['b1 c3', 'd7 d5', 'c3 b1', 'd5 d4','e2 e4', 'd4 e3']
     vz2 = ['b1 c3', 'd7 d5', 'c3 b1', 'd5 d4','e2 e4', 'd4 e3']
     debug(vz2)
-
